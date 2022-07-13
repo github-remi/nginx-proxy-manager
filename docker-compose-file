@@ -1,0 +1,37 @@
+version: '3'
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    environment:
+      DB_MYSQL_HOST: "db"
+      DB_MYSOL_PORT: 3306
+      DB MYSOL USER: "npm"
+      DB_MYSQL_PASSWORD: "npm"
+      DB MYSQL NAME: "npm"
+    volumes:
+      - ./data/nginx-proxy-manager:/data
+      - ./letsencrypt:/etc/letsencrypt
+    depends_on:
+      - db
+  db:
+    image: 'jc21/mariadb-aria:latest'
+    restart: always
+    environment:
+      MYSOL ROOT PASSWORD: 'npm'
+      MYSOL DATABASE: 'npm'
+      MYSQL_USER: 'npm'
+      MYSOL PASSWORD: 'npm'
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+  autoheal:
+    restart: always
+    image: 'willfarrell/autoheal'
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
